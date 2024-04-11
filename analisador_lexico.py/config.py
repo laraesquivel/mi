@@ -5,7 +5,7 @@ DELIMETER_CHAR_SET = set(['.', '{' , '}' , ';' , ',' , '(' , ')' ,']','['])
 
 STOP_ERRORS = set(['!','&','|','=','>','<','+','-','*','/','.','{','}',';','(',')',']','[',','])
 
-ASCII = [chr(i) for i in range(32, 127) if i != 34]
+ASCII = set(chr(i) for i in range(32, 127) if i != 34)
 
 
 REGEX_BLOCK_COMMENT_PATTERN = r'/\*.*?\*/'

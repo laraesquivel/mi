@@ -1,5 +1,6 @@
 from config import (OP_LOGIC_ONE_CHAR_SET, OP_RELATIONAL_ONE_CHAR_SET, OP_ARITIMETIC_ONE_CHAR_SET,
-                    DELIMETER_CHAR_SET, STOP_ERRORS)
+                    DELIMETER_CHAR_SET, STOP_ERRORS, ASCII)
+
 from interfaces import ComentarioBlocoAberto
 
 class State_Machine:
@@ -78,10 +79,70 @@ class State_Machine:
             print(self.current_char)
             self.alltokens.append((self.line_number,'REL',possible_token))
                       
-    def op_aritimetic_state(self):
-        pass
-    def cadeia_state(self):
-        pass
+    def __op_aritimetic_state(self):
+        possible_token = self.current_char
+        if possible_token == '-':
+            self.pos+=1
+            self.current_char = self.line[self.pos] if self.pos < self.line else ''
+            if self.current_char in OP_ARITIMETIC_ONE_CHAR_SET: #Verificando se é ++ ou --
+                match(self.current_char):
+                    case "-":
+                        possible_token+="-"
+                        self.alltokens.append((self.line_number,'ART',possible_token))
+                    case "+":
+                        possible_token+='+'
+                        self.alltokens.append((self.line_number,'ART',possible_token))
+                    
+                    case _:
+                        self.alltokens.append((self.line_number,'ART',possible_token))
+                        self.pos-=1
+            else:
+                if self.current_char.isdigit(): #Numero Negativo
+                    pass
+
+
+                    
+
+
+
+        
+
+    def __cadeia_state(self):
+        cadeia = self.current_char
+
+        cadeia_close = False
+
+        self.pos+=1 #proximo caractere da cadeia
+        self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+        cadeia_close = True if self.current_char == '"' else False
+        cadeia = cadeia + self.current_char if self.current_char else cadeia
+        ascii_invalid = self.current_char not in ASCII and (self.current_char != '"' and self.current_char != '')
+
+
+        while self.pos <len(self.line) and not cadeia_close:
+            if not ascii_invalid:
+                self.pos+=1
+                self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                cadeia_close = True if self.current_char == '"' else False
+                ascii_invalid = self.current_char not in ASCII and (self.current_char != '"' and self.current_char != '')
+                print((self.current_char, ascii_invalid))
+                cadeia= cadeia + self.current_char if self.current_char else cadeia
+            else:
+                while self.pos < len(self.line) and not cadeia_close:
+                    self.pos +=1
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                    if self.current_char == '"':
+                        cadeia_close = True
+
+        if cadeia_close and not ascii_invalid:
+            self.alltokens.append((self.line_number,'CAC',cadeia))
+            self.pos+=1
+        
+        else:
+            self.alltokens.append((self.line_number,'CMF',cadeia))
+            self.pos+=1
+
+        
 
     def next_token(self):
 
@@ -90,22 +151,23 @@ class State_Machine:
             self.current_char = self.line[self.pos]
             #self.next_char = self.line[self.pos + 1] if len(self.line) < 2 else None
 
-            if self.current_char.isdigit():#NUMERO 
-                pass
-            
-            elif self.current_char == '/': #COMENTARIO
+            if self.current_char == '/': #COMENTARIO
                 self.__comment_state()
 
             elif self.current_char in OP_LOGIC_ONE_CHAR_SET: #OPERADOR_LOGICO
                 self.__op_logic_state()
-
+ 
             elif self.current_char in OP_RELATIONAL_ONE_CHAR_SET: #OPERADOR RELACIONAL
                 self.__op_relational_state()
 
             elif self.current_char in OP_ARITIMETIC_ONE_CHAR_SET: #OPERADOR ARITMETICO
                 pass
-            elif self.current_char == '"': #CADEIRA 
+
+            elif self.current_char.isdigit():
                 pass
+            elif self.current_char == '"': #CADEIRA 
+                self.__cadeia_state()
+
             elif self.current_char in DELIMETER_CHAR_SET: #Delimitador
                 pass
             elif self.current_char.isspace(): #Espaço
@@ -116,9 +178,8 @@ class State_Machine:
 
 
 
-a = '! || && |& >= != > > > /*aishahdahodahoshaohsjoasa'
+a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
 b = State_Machine(a,0)
 b.next_token()
 print(b.alltokens)
-                
-
+print("Ç"not in ASCII)

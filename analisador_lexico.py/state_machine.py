@@ -99,13 +99,7 @@ class State_Machine:
             else:
                 if self.current_char.isdigit(): #Numero Negativo
                     pass
-
-
-                    
-
-
-
-        
+    
 
     def __cadeia_state(self):
         cadeia = self.current_char
@@ -142,7 +136,13 @@ class State_Machine:
             self.alltokens.append((self.line_number,'CMF',cadeia))
             self.pos+=1
 
-        
+    # estado para indentificação de números
+    def __numbers_state(self):
+        pass
+
+    #estado para indentificar identificadores e palavras reservadas
+    def __indentifier_reserved_word_state(self):
+        pass
 
     def next_token(self):
 

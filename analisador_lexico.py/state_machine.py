@@ -141,8 +141,37 @@ class State_Machine:
         pass
 
     #estado para indentificar identificadores e palavras reservadas
-    def __indentifier_reserved_word_state(self):
-        pass
+    def __identifier_reserved_word_state(self):
+        identificador = self.current_char
+
+        # primeiro verifica se o carcatere atual está dentro do intervalo ASCII Utilizado
+        ascii_invalid = self.current_char not in ASCII
+        identificador_MF = False
+        fim_indentificador = False
+        if ascii_invalid:
+            self.alltokens.append((self.line_number,'TMF',identificador))
+        else:
+            # se não houver erro de formação no começo percorre todo identificador
+
+            self.pos+=1 #proximo caractere do identificador
+            self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+            # percorre até o fim de linha
+            while self.pos <len(self.line) and not fim_indentificador:
+                #verifica se é um ASCII valido
+                ascii_invalid = self.current_char not in ASCII and (self.current_char != '"' and self.current_char != '')
+                #verifica se é um dos permitidos
+                if self.current_char.isdigit() or self.current_char.isalpha() or self.current_char =='_':
+                    identificador+=self.current_char
+                elif self.current_char in STOP_ERRORS or self.current_char =='\n' or self.current_char ==' ':
+                    #fim de char encerra o laço
+                    fim_indentificador = True
+                # atualiza para proximo caractere
+                self.pos+=1 
+                self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+            if ascii_invalid:
+                self.alltokens.append((self.line_number,'IMF',identificador))
+            else:
+                self.alltokens.append((self.line_number,'IDF',identificador))
 
     def next_token(self):
 
@@ -173,7 +202,7 @@ class State_Machine:
             elif self.current_char.isspace(): #Espaço
                 self.pos = self.pos + 1 
             else:  #Palavra Reservada ou Identificador
-                pass
+                self.__identifier_reserved_word_state()
             
 
 

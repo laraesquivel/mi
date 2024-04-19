@@ -158,12 +158,19 @@ class State_Machine:
                 #se for um ponto decimal
                 elif self.current_char == '.' and not numero_Mal_formado:
                     # inicio da parte fracionaria do número
-                    print('ponto')
                     ponto_decimal=True
                     numero += self.current_char
                     #proximo caractere do numero
                     self.pos+=1 
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+
+                    # faz a verificação imediata do char depois da virgula
+                    if self.current_char in STOP_ERRORS:
+                        numero_Mal_formado = True
+                        numero += self.current_char
+                        #proximo caractere do numero
+                        self.pos+=1 
+                        self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
                 # se for um espaço ou delimitador é o fim do número
                 elif self.current_char == ' ' or self.current_char in STOP_ERRORS:
                     fim_numero= True
@@ -174,9 +181,7 @@ class State_Machine:
                     numero += self.current_char
                     #proximo caractere do numero
                     self.pos+=1 
-                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
-
-                    
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''  
             #caso seja a parte decimal
             else:
                 #se for um digito
@@ -186,12 +191,25 @@ class State_Machine:
                     #proximo caractere do numero
                     self.pos+=1 
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
-                # se encontrou o fim do numero
-                elif self.current_char == ' ':
+                elif self.current_char == '.' and not numero_Mal_formado:
+                    # outro . antes de finalizar o número é um erro
+                    numero_Mal_formado = True
+
+                    numero += self.current_char
+                    #proximo caractere do numero
+                    self.pos+=1 
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                # se encontrou o fim do numero 
+                elif self.current_char == ' ' or self.current_char in STOP_ERRORS:
                     fim_numero =True
                 # caso não seja um digito ou fim do numero ex ['-', ' ','\n']
                 elif not self.current_char.isdigit():
-                    numero_Mal_formado
+                    numero_Mal_formado=True
+
+                    numero += self.current_char
+                    #proximo caractere do numero
+                    self.pos+=1 
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else '' 
 
         # finalizada a leitura do lexema
         if not numero_Mal_formado:
@@ -276,7 +294,7 @@ class State_Machine:
                 
         
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-a= '4aksksaksaakjkajakjjs5>a'
+a= '4 4444444 4.4 4.85585 4a 458as552 55_20 4.+1 4.+18>5 4.1.1555>s'
 b = State_Machine(a,0)
 b.next_token()
 print(b.alltokens)

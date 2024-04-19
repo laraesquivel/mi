@@ -13,8 +13,6 @@ class State_Machine:
 
         self.alltokens = []
 
-    def number_state(self):
-        pass
     def __comment_state(self): #/
         self.pos +=1
         self.current_char = self.line[self.pos] if self.pos < len(self.line) else None
@@ -261,6 +259,19 @@ class State_Machine:
                 else:
                     self.alltokens.append((self.line_number,'IDE',identificador))
 
+    def __delimiter_state(self):
+        delimitador=''
+        #verificação de segurança
+        # o if é desnecessario ja que só pode chegar nesses estado com um delimitador valido
+        if self.current_char in DELIMETER_CHAR_SET:
+            delimitador=self.current_char
+
+            self.pos+=1
+            self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+
+            self.alltokens.append((self.line_number,'DEL',delimitador))
+        else:
+            print('erro de delimitador ????')
     def next_token(self):
 
         while self.pos < len(self.line):
@@ -284,9 +295,8 @@ class State_Machine:
                 self.__numbers_state()
             elif self.current_char == '"': #CADEIRA 
                 self.__cadeia_state()
-
             elif self.current_char in DELIMETER_CHAR_SET: #Delimitador
-                pass
+                self.__delimiter_state()
             elif self.current_char.isspace(): #Espaço
                 self.pos = self.pos + 1 
             else:  #Palavra Reservada ou Identificador
@@ -294,7 +304,7 @@ class State_Machine:
                 
         
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-a= '4 4444444 4.4 4.85585 4a 458as552 55_20 4.+1 4.+18>5 4.1.1555>s'
+a= '4 . ; (b) {n} ["a"] ,'
 b = State_Machine(a,0)
 b.next_token()
 print(b.alltokens)

@@ -11,7 +11,10 @@ class State_Machine:
         self.line_number = line_number
         self.pos = 0
 
+        # lista e tokens
         self.alltokens = []
+        # lsita de tokens de erros
+        self.all_error_tokens = []
 
     def __comment_state(self): #/
         self.pos +=1
@@ -36,7 +39,6 @@ class State_Machine:
                     raise ComentarioBlocoAberto
         else:
             self.alltokens.append((self.line_number,'ART','/'))
-
 
     def __op_logic_state(self):
         #LOGIC
@@ -98,7 +100,6 @@ class State_Machine:
                 if self.current_char.isdigit(): #Numero Negativo
                     pass
     
-
     def __cadeia_state(self):
         cadeia = self.current_char
 
@@ -218,13 +219,17 @@ class State_Machine:
     #estado para indentificar identificadores e palavras reservadas
     def __identifier_reserved_word_state(self):
         identificador = self.current_char
-        # primeiro verifica se o caractere atual está dentro do intervalo ASCII Utilizado
-        ascii_invalid = self.current_char not in ASCII
+        
         identificador_MF = False
         fim_indentificador = False
 
+        # primeiro verifica se o caractere atual está dentro do intervalo ASCII Utilizado
+        ascii_invalid = self.current_char not in ASCII or (not self.current_char.isdigit() and not self.current_char.isalpha() )
+
         if ascii_invalid:
             self.alltokens.append((self.line_number,'TMF',identificador))
+            self.pos+=1 #proximo caractere do identificador
+            self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
         else:
             # se não houver erro de formação no começo percorre todo identificador
             self.pos+=1 #proximo caractere do identificador
@@ -272,6 +277,7 @@ class State_Machine:
             self.alltokens.append((self.line_number,'DEL',delimitador))
         else:
             print('erro de delimitador ????')
+
     def next_token(self):
 
         while self.pos < len(self.line):
@@ -304,7 +310,7 @@ class State_Machine:
                 
         
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-a= '4 . ; (b) {n} ["a"] ,'
+a= '/ //'
 b = State_Machine(a,0)
 b.next_token()
 print(b.alltokens)

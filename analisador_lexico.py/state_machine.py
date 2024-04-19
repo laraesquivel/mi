@@ -1,5 +1,5 @@
 from config import (OP_LOGIC_ONE_CHAR_SET, OP_RELATIONAL_ONE_CHAR_SET, OP_ARITIMETIC_ONE_CHAR_SET,
-                    DELIMETER_CHAR_SET, STOP_ERRORS, ASCII)
+                    DELIMETER_CHAR_SET, STOP_ERRORS, ASCII,RESERVED_WORDS)
 
 from interfaces import ComentarioBlocoAberto
 
@@ -174,9 +174,15 @@ class State_Machine:
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
             # encerrado o laço insere o token equivalente
             if identificador_MF:
+                # se houve um simbolo invalido no identificador
+                # criar o token do identificador mal formado
                 self.alltokens.append((self.line_number,'IMF',identificador))
             else:
-                self.alltokens.append((self.line_number,'IDM',identificador))
+                # se é um identificador valido pode ser uma palavra reservada
+                if identificador in RESERVED_WORDS:
+                    self.alltokens.append((self.line_number,'PRE',identificador))
+                else:
+                    self.alltokens.append((self.line_number,'IDE',identificador))
 
     def next_token(self):
 
@@ -209,12 +215,10 @@ class State_Machine:
                 self.pos = self.pos + 1 
             else:  #Palavra Reservada ou Identificador
                 self.__identifier_reserved_word_state()
-            
-
-
-
+                
+        
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-a= 'if numero nu_me_r0 num_ n@as n@a.separador'
+a= 'if se algoritmo Algoritimo numero nu_me_r0 num_ n@as n@a/separador'
 b = State_Machine(a,0)
 b.next_token()
 print(b.alltokens)

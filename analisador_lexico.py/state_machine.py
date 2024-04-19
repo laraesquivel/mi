@@ -81,7 +81,8 @@ class State_Machine:
                       
     def __op_aritimetic_state(self):
         possible_token = self.current_char
-
+        # obtém o tipo do ultimo token 
+        self.last_token= self.alltokens[-1][1] if len(self.alltokens) != 0  else '' 
         # começando pelo operador - temos três possibilidades : -,-- ou numero negativo
         if possible_token == '-':
             #proximo lexema
@@ -97,7 +98,14 @@ class State_Machine:
                 self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
             elif self.current_char.isdigit():
                 # se for um digito então verificamos pelo token anterior se será um número negativo ou operador -
-                pass
+                if self.last_token == 'IDE' or self.last_token == 'NRO':
+                    # se o token anterior for um IDE ou NRO então o - é um operador
+                    self.alltokens.append((self.line_number,'ART',possible_token))
+                    # não atualiza para o proximo char pois já está em digito
+                else:
+                    # nos outros casos então temos um número negativo
+                    # faz a chamada para o método de número com a flag de negativo
+                    self.__numbers_state(True)
             # para qualquer ouro caso é o operador -
             else:
                 # insere na lista de tokens sem concatenar novo lexema
@@ -126,7 +134,7 @@ class State_Machine:
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
                 case '/':
                     # o operador / já é tratado no estado do comentario devido a prioridade
-                    pass
+                    print('cheguei aqui')
     
     def __cadeia_state(self):
         cadeia = self.current_char
@@ -164,8 +172,11 @@ class State_Machine:
             self.pos+=1
 
     # estado para indentificação de números
-    def __numbers_state(self):
-        numero =self.current_char
+    def __numbers_state(self,negativo=False):
+        
+        numero = ('-'+self.current_char) if negativo else self.current_char
+
+        #numero+=self.current_char
         ponto_decimal = False
         fim_numero = False
         numero_Mal_formado= False
@@ -335,10 +346,9 @@ class State_Machine:
                 self.pos = self.pos + 1 
             else:  #Palavra Reservada ou Identificador
                 self.__identifier_reserved_word_state()
-                
         
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-a= '+++---* / '
+a= '4-4 4--4 4+-4 A-4 =-4 -4 .-4 (-4) 5/-4'
 b = State_Machine(a,0)
 b.next_token()
 print(b.alltokens)

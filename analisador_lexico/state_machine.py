@@ -4,14 +4,26 @@ from config import (OP_LOGIC_ONE_CHAR_SET, OP_RELATIONAL_ONE_CHAR_SET, OP_ARITIM
 from interfaces import ComentarioBlocoAberto
 
 class State_Machine:
-    def __init__(self,line,line_number) -> None:
+    def __init__(self) -> None:
+        self.line = None
+        self.current_char = None
+        self.last_token = None
+        self.line_number = None
+        self.pos = 0
+
+        self.alltokens = []
+
+    def new_line(self,line,line_number):
         self.line = line
         self.current_char = None
         self.last_token = None
         self.line_number = line_number
         self.pos = 0
+        self.alltokens.clear()
 
-        self.alltokens = []
+    def get_pop_cmf(self):
+        return self.alltokens.pop()
+        
 
     def number_state(self):
         pass
@@ -25,16 +37,19 @@ class State_Machine:
             elif self.current_char =='*': #Bloco Coment
                 self.pos+= 1
                 self.current_char = self.line[self.pos] if self.pos < len(self.line) else None
-                
+                block_comment_str = '/*' + self.current_char if self.current_char else ''
+
                 while self.current_char:
                     self.pos+=1
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else None
                     next_char = self.line[self.pos + 1] if self.pos + 1 < len(self.line) else None
+                    block_comment_str = block_comment_str + self.current_char  if self.current_char else block_comment_str
                     if self.current_char == '*' and next_char=='/': #Comentario de bloco fechou na msm linha
                         self.pos+=2
                         break
 
                 if not self.current_char:
+                    self.alltokens.append((self.line_number,'CMF',block_comment_str))
                     raise ComentarioBlocoAberto
         else:
             self.alltokens.append((self.line_number,'ART','/'))
@@ -214,8 +229,16 @@ class State_Machine:
 
 
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-a= 'if numero nu_me_r0 num_ n@as n@a.separador'
+#a= 'if numero nu_me_r0 num_ n@as n@a.separador'
+
+'''
+a = 'nanknsaonso  /*aisjgaidgaiddh'
 b = State_Machine(a,0)
-b.next_token()
-print(b.alltokens)
+
+try:
+    b.next_token()
+    print(b.alltokens)
+except:
+    print(b.alltokens)
 print("Ç"not in ASCII)
+'''

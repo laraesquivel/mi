@@ -1,5 +1,5 @@
 from config import (OP_LOGIC_ONE_CHAR_SET, OP_RELATIONAL_ONE_CHAR_SET, OP_ARITIMETIC_ONE_CHAR_SET,
-                    DELIMETER_CHAR_SET, STOP_ERRORS, ASCII)
+                    DELIMETER_CHAR_SET, STOP_ERRORS, ASCII,RESERVED_WORDS)
 
 from interfaces import ComentarioBlocoAberto
 
@@ -153,8 +153,85 @@ class State_Machine:
 
     # estado para indentificação de números
     def __numbers_state(self):
-        pass
+        numero =self.current_char
+        ponto_decimal = False
+        fim_numero = False
+        numero_Mal_formado= False
+        # pega proximo lexema
+        self.pos+=1 #proximo caractere do numero
+        self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+        # executa o laço até chegar ao fim de linha fim do número ou ponto decimal
+        while self.pos <len(self.line) and not fim_numero:
+            if not ponto_decimal:
+                #se for um digito
+                if self.current_char.isdigit():
+                    # concatena o numero
+                    numero += self.current_char
+                    #proximo caractere do numero
+                    self.pos+=1 
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                #se for um ponto decimal
+                elif self.current_char == '.' and not numero_Mal_formado:
+                    # inicio da parte fracionaria do número
+                    ponto_decimal=True
+                    numero += self.current_char
+                    #proximo caractere do numero
+                    self.pos+=1 
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
 
+                    # faz a verificação imediata do char depois da virgula
+                    if self.current_char in STOP_ERRORS:
+                        numero_Mal_formado = True
+                        numero += self.current_char
+                        #proximo caractere do numero
+                        self.pos+=1 
+                        self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                # se for um espaço ou delimitador é o fim do número
+                elif self.current_char == ' ' or self.current_char in STOP_ERRORS:
+                    fim_numero= True
+                # se não for um digito
+                elif not self.current_char.isdigit():
+                    numero_Mal_formado = True
+
+                    numero += self.current_char
+                    #proximo caractere do numero
+                    self.pos+=1 
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''  
+            #caso seja a parte decimal
+            else:
+                #se for um digito
+                if self.current_char.isdigit():
+                    # concatena o numero
+                    numero += self.current_char
+                    #proximo caractere do numero
+                    self.pos+=1 
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                elif self.current_char == '.' and not numero_Mal_formado:
+                    # outro . antes de finalizar o número é um erro
+                    numero_Mal_formado = True
+
+                    numero += self.current_char
+                    #proximo caractere do numero
+                    self.pos+=1 
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                # se encontrou o fim do numero 
+                elif self.current_char == ' ' or self.current_char in STOP_ERRORS:
+                    fim_numero =True
+                # caso não seja um digito ou fim do numero ex ['-', ' ','\n']
+                elif not self.current_char.isdigit():
+                    numero_Mal_formado=True
+
+                    numero += self.current_char
+                    #proximo caractere do numero
+                    self.pos+=1 
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else '' 
+
+        # finalizada a leitura do lexema
+        if not numero_Mal_formado:
+            self.alltokens.append((self.line_number,'NRO',numero))
+        else:
+            self.alltokens.append((self.line_number,'NMF',numero))
+        print(self.current_char)
     #estado para indentificar identificadores e palavras reservadas
     def __identifier_reserved_word_state(self):
         identificador = self.current_char
@@ -189,9 +266,15 @@ class State_Machine:
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
             # encerrado o laço insere o token equivalente
             if identificador_MF:
+                # se houve um simbolo invalido no identificador
+                # criar o token do identificador mal formado
                 self.alltokens.append((self.line_number,'IMF',identificador))
             else:
-                self.alltokens.append((self.line_number,'IDM',identificador))
+                # se é um identificador valido pode ser uma palavra reservada
+                if identificador in RESERVED_WORDS:
+                    self.alltokens.append((self.line_number,'PRE',identificador))
+                else:
+                    self.alltokens.append((self.line_number,'IDE',identificador))
 
     def next_token(self):
 
@@ -207,14 +290,13 @@ class State_Machine:
                 self.__op_logic_state()
  
             elif self.current_char in OP_RELATIONAL_ONE_CHAR_SET: #OPERADOR RELACIONAL
-                print('passei aqui')
                 self.__op_relational_state()
 
             elif self.current_char in OP_ARITIMETIC_ONE_CHAR_SET: #OPERADOR ARITMETICO
                 pass
 
             elif self.current_char.isdigit():
-                pass
+                self.__numbers_state()
             elif self.current_char == '"': #CADEIRA 
                 self.__cadeia_state()
 
@@ -224,15 +306,10 @@ class State_Machine:
                 self.pos = self.pos + 1 
             else:  #Palavra Reservada ou Identificador
                 self.__identifier_reserved_word_state()
-            
-
-
-
+                
+        
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-#a= 'if numero nu_me_r0 num_ n@as n@a.separador'
-
-'''
-a = 'nanknsaonso  /*aisjgaidgaiddh'
+a= '4 4444444 4.4 4.85585 4a 458as552 55_20 4.+1 4.+18>5 4.1.1555>s'
 b = State_Machine(a,0)
 
 try:

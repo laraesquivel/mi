@@ -81,23 +81,51 @@ class State_Machine:
                       
     def __op_aritimetic_state(self):
         possible_token = self.current_char
+
+        # começando pelo operador - temos três possibilidades : -,-- ou numero negativo
         if possible_token == '-':
+            #proximo lexema
             self.pos+=1
-            self.current_char = self.line[self.pos] if self.pos < self.line else ''
-            if self.current_char in OP_ARITIMETIC_ONE_CHAR_SET: #Verificando se é ++ ou --
-                match(self.current_char):
-                    case "-":
-                        possible_token+="-"
-                        self.alltokens.append((self.line_number,'ART',possible_token))
-                    case "+":
-                        possible_token+='+'
-                        self.alltokens.append((self.line_number,'ART',possible_token))
-                    
-                    case _:
-                        self.alltokens.append((self.line_number,'ART',possible_token))
-                        self.pos-=1
+            self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+
+            #se for operador de decremento
+            if self.current_char == '-':
+                possible_token+=self.current_char
+                self.alltokens.append((self.line_number,'ART',possible_token))
+                #proximo lexema
+                self.pos+=1
+                self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+            elif self.current_char.isdigit():
+                # se for um digito então verificamos pelo token anterior se será um número negativo ou operador -
+                pass
+            # para qualquer ouro caso é o operador -
             else:
-                if self.current_char.isdigit(): #Numero Negativo
+                # insere na lista de tokens sem concatenar novo lexema
+                self.alltokens.append((self.line_number,'ART',possible_token))
+        # se não for o - então verifica os outros casos
+        else:
+            next_char = self.line[self.pos+1] if self.pos+1 < len(self.line) else ''
+            match(possible_token):
+                case '+':
+                    if next_char == '+':
+                        #proximo lexema
+                        self.pos+=1
+                        self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+
+                        possible_token+= self.current_char
+                    # insere novo token e atuaLiza proximo lexema
+                    self.alltokens.append((self.line_number,'ART',possible_token))
+
+                    self.pos+=1
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                case '*':
+                    # insere novo token e atuaLiza proximo lexema
+                    self.alltokens.append((self.line_number,'ART',possible_token))
+
+                    self.pos+=1
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                case '/':
+                    # o operador / já é tratado no estado do comentario devido a prioridade
                     pass
     
     def __cadeia_state(self):
@@ -295,11 +323,11 @@ class State_Machine:
                 self.__op_relational_state()
 
             elif self.current_char in OP_ARITIMETIC_ONE_CHAR_SET: #OPERADOR ARITMETICO
-                pass
+                self.__op_aritimetic_state()
 
             elif self.current_char.isdigit():
                 self.__numbers_state()
-            elif self.current_char == '"': #CADEIRA 
+            elif self.current_char == '"': #CADEIA 
                 self.__cadeia_state()
             elif self.current_char in DELIMETER_CHAR_SET: #Delimitador
                 self.__delimiter_state()
@@ -310,7 +338,7 @@ class State_Machine:
                 
         
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-a= '/ //'
+a= '+++---* / '
 b = State_Machine(a,0)
 b.next_token()
 print(b.alltokens)

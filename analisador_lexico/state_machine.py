@@ -24,9 +24,11 @@ class State_Machine:
     def get_pop_cmf(self):
         return self.alltokens.pop()
         
+        # lista e tokens
+        self.alltokens = []
+        # lsita de tokens de erros
+        self.all_error_tokens = []
 
-    def number_state(self):
-        pass
     def __comment_state(self): #/
         self.pos +=1
         self.current_char = self.line[self.pos] if self.pos < len(self.line) else None
@@ -53,7 +55,6 @@ class State_Machine:
                     raise ComentarioBlocoAberto
         else:
             self.alltokens.append((self.line_number,'ART','/'))
-
 
     def __op_logic_state(self):
         #LOGIC
@@ -96,26 +97,61 @@ class State_Machine:
                       
     def __op_aritimetic_state(self):
         possible_token = self.current_char
+        # obtém o tipo do ultimo token 
+        self.last_token= self.alltokens[-1][1] if len(self.alltokens) != 0  else '' 
+        # começando pelo operador - temos três possibilidades : -,-- ou numero negativo
         if possible_token == '-':
+            #proximo lexema
             self.pos+=1
-            self.current_char = self.line[self.pos] if self.pos < self.line else ''
-            if self.current_char in OP_ARITIMETIC_ONE_CHAR_SET: #Verificando se é ++ ou --
-                match(self.current_char):
-                    case "-":
-                        possible_token+="-"
-                        self.alltokens.append((self.line_number,'ART',possible_token))
-                    case "+":
-                        possible_token+='+'
-                        self.alltokens.append((self.line_number,'ART',possible_token))
-                    
-                    case _:
-                        self.alltokens.append((self.line_number,'ART',possible_token))
-                        self.pos-=1
-            else:
-                if self.current_char.isdigit(): #Numero Negativo
-                    pass
-    
+            self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
 
+            #se for operador de decremento
+            if self.current_char == '-':
+                possible_token+=self.current_char
+                self.alltokens.append((self.line_number,'ART',possible_token))
+                #proximo lexema
+                self.pos+=1
+                self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+            elif self.current_char.isdigit():
+                # se for um digito então verificamos pelo token anterior se será um número negativo ou operador -
+                if self.last_token == 'IDE' or self.last_token == 'NRO':
+                    # se o token anterior for um IDE ou NRO então o - é um operador
+                    self.alltokens.append((self.line_number,'ART',possible_token))
+                    # não atualiza para o proximo char pois já está em digito
+                else:
+                    # nos outros casos então temos um número negativo
+                    # faz a chamada para o método de número com a flag de negativo
+                    self.__numbers_state(True)
+            # para qualquer ouro caso é o operador -
+            else:
+                # insere na lista de tokens sem concatenar novo lexema
+                self.alltokens.append((self.line_number,'ART',possible_token))
+        # se não for o - então verifica os outros casos
+        else:
+            next_char = self.line[self.pos+1] if self.pos+1 < len(self.line) else ''
+            match(possible_token):
+                case '+':
+                    if next_char == '+':
+                        #proximo lexema
+                        self.pos+=1
+                        self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+
+                        possible_token+= self.current_char
+                    # insere novo token e atuaLiza proximo lexema
+                    self.alltokens.append((self.line_number,'ART',possible_token))
+
+                    self.pos+=1
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                case '*':
+                    # insere novo token e atuaLiza proximo lexema
+                    self.alltokens.append((self.line_number,'ART',possible_token))
+
+                    self.pos+=1
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                case '/':
+                    # o operador / já é tratado no estado do comentario devido a prioridade
+                    print('cheguei aqui')
+    
     def __cadeia_state(self):
         cadeia = self.current_char
 
@@ -152,8 +188,11 @@ class State_Machine:
             self.pos+=1
 
     # estado para indentificação de números
-    def __numbers_state(self):
-        numero =self.current_char
+    def __numbers_state(self,negativo=False):
+        
+        numero = ('-'+self.current_char) if negativo else self.current_char
+
+        #numero+=self.current_char
         ponto_decimal = False
         fim_numero = False
         numero_Mal_formado= False
@@ -235,13 +274,17 @@ class State_Machine:
     #estado para indentificar identificadores e palavras reservadas
     def __identifier_reserved_word_state(self):
         identificador = self.current_char
-        # primeiro verifica se o caractere atual está dentro do intervalo ASCII Utilizado
-        ascii_invalid = self.current_char not in ASCII
+        
         identificador_MF = False
         fim_indentificador = False
 
+        # primeiro verifica se o caractere atual está dentro do intervalo ASCII Utilizado
+        ascii_invalid = self.current_char not in ASCII or (not self.current_char.isdigit() and not self.current_char.isalpha() )
+
         if ascii_invalid:
             self.alltokens.append((self.line_number,'TMF',identificador))
+            self.pos+=1 #proximo caractere do identificador
+            self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
         else:
             # se não houver erro de formação no começo percorre todo identificador
             self.pos+=1 #proximo caractere do identificador
@@ -276,6 +319,20 @@ class State_Machine:
                 else:
                     self.alltokens.append((self.line_number,'IDE',identificador))
 
+    def __delimiter_state(self):
+        delimitador=''
+        #verificação de segurança
+        # o if é desnecessario ja que só pode chegar nesses estado com um delimitador valido
+        if self.current_char in DELIMETER_CHAR_SET:
+            delimitador=self.current_char
+
+            self.pos+=1
+            self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+
+            self.alltokens.append((self.line_number,'DEL',delimitador))
+        else:
+            print('erro de delimitador ????')
+
     def next_token(self):
 
         while self.pos < len(self.line):
@@ -293,23 +350,21 @@ class State_Machine:
                 self.__op_relational_state()
 
             elif self.current_char in OP_ARITIMETIC_ONE_CHAR_SET: #OPERADOR ARITMETICO
-                pass
+                self.__op_aritimetic_state()
 
             elif self.current_char.isdigit():
                 self.__numbers_state()
-            elif self.current_char == '"': #CADEIRA 
+            elif self.current_char == '"': #CADEIA 
                 self.__cadeia_state()
-
             elif self.current_char in DELIMETER_CHAR_SET: #Delimitador
-                pass
+                self.__delimiter_state()
             elif self.current_char.isspace(): #Espaço
                 self.pos = self.pos + 1 
             else:  #Palavra Reservada ou Identificador
                 self.__identifier_reserved_word_state()
-                
         
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-a= '4 4444444 4.4 4.85585 4a 458as552 55_20 4.+1 4.+18>5 4.1.1555>s'
+a= '4-4 4--4 4+-4 A-4 =-4 -4 .-4 (-4) 5/-4'
 b = State_Machine(a,0)
 
 try:

@@ -99,13 +99,7 @@ class State_Machine:
             else:
                 if self.current_char.isdigit(): #Numero Negativo
                     pass
-
-
-                    
-
-
-
-        
+    
 
     def __cadeia_state(self):
         cadeia = self.current_char
@@ -142,7 +136,47 @@ class State_Machine:
             self.alltokens.append((self.line_number,'CMF',cadeia))
             self.pos+=1
 
-        
+    # estado para indentificação de números
+    def __numbers_state(self):
+        pass
+
+    #estado para indentificar identificadores e palavras reservadas
+    def __identifier_reserved_word_state(self):
+        identificador = self.current_char
+        # primeiro verifica se o caractere atual está dentro do intervalo ASCII Utilizado
+        ascii_invalid = self.current_char not in ASCII
+        identificador_MF = False
+        fim_indentificador = False
+
+        if ascii_invalid:
+            self.alltokens.append((self.line_number,'TMF',identificador))
+        else:
+            # se não houver erro de formação no começo percorre todo identificador
+            self.pos+=1 #proximo caractere do identificador
+            self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+            # percorre até o fim de linha ou fim do identificador
+            while self.pos <len(self.line) and not fim_indentificador:
+                #verifica se é um dos permitidos
+                if self.current_char.isdigit() or self.current_char.isalpha() or self.current_char =='_':
+                    identificador+= self.current_char
+                    self.pos+=1
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                # se for um delimitador, fim de linha ou espaço
+                elif self.current_char in STOP_ERRORS or self.current_char =='\n' or self.current_char ==' ':
+                    #marca o fim do identificador
+                    fim_indentificador=True
+                # se for qualquer simbolo invalido marca como identificador mal formado
+                else:
+                    identificador_MF = True
+                    #atualiza para proxima posição
+                    identificador+= self.current_char
+                    self.pos+=1
+                    self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+            # encerrado o laço insere o token equivalente
+            if identificador_MF:
+                self.alltokens.append((self.line_number,'IMF',identificador))
+            else:
+                self.alltokens.append((self.line_number,'IDM',identificador))
 
     def next_token(self):
 
@@ -158,6 +192,7 @@ class State_Machine:
                 self.__op_logic_state()
  
             elif self.current_char in OP_RELATIONAL_ONE_CHAR_SET: #OPERADOR RELACIONAL
+                print('passei aqui')
                 self.__op_relational_state()
 
             elif self.current_char in OP_ARITIMETIC_ONE_CHAR_SET: #OPERADOR ARITMETICO
@@ -173,12 +208,13 @@ class State_Machine:
             elif self.current_char.isspace(): #Espaço
                 self.pos = self.pos + 1 
             else:  #Palavra Reservada ou Identificador
-                pass
+                self.__identifier_reserved_word_state()
             
 
 
 
-a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
+#a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
+a= 'if numero nu_me_r0 num_ n@as n@a.separador'
 b = State_Machine(a,0)
 b.next_token()
 print(b.alltokens)

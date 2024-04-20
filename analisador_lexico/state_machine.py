@@ -24,11 +24,6 @@ class State_Machine:
     def get_pop_cmf(self):
         return self.alltokens.pop()
         
-        # lista e tokens
-        self.alltokens = []
-        # lsita de tokens de erros
-        self.all_error_tokens = []
-
     def __comment_state(self): #/
         self.pos +=1
         self.current_char = self.line[self.pos] if self.pos < len(self.line) else None
@@ -53,8 +48,8 @@ class State_Machine:
                 if not self.current_char:
                     self.alltokens.append((self.line_number,'CMF',block_comment_str))
                     raise ComentarioBlocoAberto
-        else:
-            self.alltokens.append((self.line_number,'ART','/'))
+            else:
+                self.alltokens.append((self.line_number,'ART','/'))
 
     def __op_logic_state(self):
         #LOGIC
@@ -271,6 +266,7 @@ class State_Machine:
         else:
             self.alltokens.append((self.line_number,'NMF',numero))
         print(self.current_char)
+
     #estado para indentificar identificadores e palavras reservadas
     def __identifier_reserved_word_state(self):
         identificador = self.current_char
@@ -333,6 +329,7 @@ class State_Machine:
         else:
             print('erro de delimitador ????')
 
+    # método executa a identificação dos tokens por linha
     def next_token(self):
 
         while self.pos < len(self.line):
@@ -364,13 +361,12 @@ class State_Machine:
                 self.__identifier_reserved_word_state()
         
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-a= '4-4 4--4 4+-4 A-4 =-4 -4 .-4 (-4) 5/-4'
-b = State_Machine(a,0)
-
+a= '=-4 = -4'
+b = State_Machine()
+b.new_line(a,0)
 try:
     b.next_token()
     print(b.alltokens)
 except:
     print(b.alltokens)
 print("Ç"not in ASCII)
-'''

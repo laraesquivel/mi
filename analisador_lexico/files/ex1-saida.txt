@@ -39,7 +39,8 @@
 8    CMF    "mensagem);
 
 9    CMF    "menÇ
-12    CoMF    TokenDefeituoso(line=12, code='CMF', token='/* exa869 mi processadores de\n')
+12    CoMF    /* exa869 mi processadores de
+
 		linguagem de programacao
 
 

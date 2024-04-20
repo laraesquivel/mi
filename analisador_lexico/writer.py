@@ -35,7 +35,7 @@ class Writer:
         output_file_path = os.path.join(Writer.dir, f"{file_name}-saida.txt")
         os.makedirs(Writer.dir, exist_ok=True)
 
-        with open(output_file_path, self.mode, encoding='utf-8') as file:
+        with open(output_file_path, 'a+', encoding='utf-8') as file:
             for token in self.errors_arr:
                 text_writer = f'{token.line}    {token.code}    {token.token}\n'
                 file.write(text_writer)

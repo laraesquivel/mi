@@ -45,7 +45,7 @@ class Analisador:
                 except ComentarioBlocoAberto:
                     self.is_open = True
                     self.error_comf_line = line_index + 1
-                    cmf = self.state_machine.alltokens.pop()
+                    cmf = self.state_machine.alltokens.pop()[2]
                     temp_tokens = self.state_machine.alltokens
                         
                     self.writer.write_all(file_name,temp_tokens)
@@ -53,6 +53,7 @@ class Analisador:
                 comf = TokenDefeituoso(self.error_comf_line, 'CoMF', cmf)
                 self.writer.errors_arr.append(comf)
                 self.is_open = False
+
             self.writer.write_errors(file_name)
             self.writer.write_clear()
                 

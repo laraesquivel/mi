@@ -1,0 +1,47 @@
+1    PRE    algoritmo
+1    PRE    principal
+1    DEL    (
+1    DEL    )
+1    DEL    {
+2    PRE    variaveis
+2    DEL    {
+3    PRE    real
+3    IDE    f
+3    REL    =
+3    NRO    3.0
+3    DEL    ;
+5    IDE    texto
+5    IDE    msg
+5    REL    =
+6    DEL    }
+7    PRE    se
+7    DEL    (
+7    IDE    f
+7    REL    >=
+7    NRO    -10
+7    DEL    )
+7    LOG    &&
+7    DEL    (
+7    IDE    f
+7    REL    <
+7    DEL    )
+7    DEL    {
+8    PRE    escreva
+8    DEL    (
+9    PRE    escreva
+9    DEL    (
+9    DEL    )
+9    DEL    ;
+11    DEL    }
+4    TMF    @
+5    CMF    "teste
+
+8    CMF    "mensagem);
+
+9    CMF    "menÇ
+12    CoMF    TokenDefeituoso(line=12, code='CMF', token='/* exa869 mi processadores de\n')
+		linguagem de programacao
+
+
+
+}

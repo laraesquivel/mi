@@ -1,7 +1,7 @@
 from config import (OP_LOGIC_ONE_CHAR_SET, OP_RELATIONAL_ONE_CHAR_SET, OP_ARITIMETIC_ONE_CHAR_SET,
                     DELIMETER_CHAR_SET, STOP_ERRORS, ASCII,RESERVED_WORDS)
 
-from interfaces import ComentarioBlocoAberto
+from interfaces import ComentarioBlocoAberto, Token, TokenDefeituoso
 
 class State_Machine:
     def __init__(self) -> None:
@@ -12,6 +12,9 @@ class State_Machine:
         self.pos = 0
 
         self.alltokens = []
+
+        self.errors = []
+        self.corrects = []
 
     def new_line(self,line,line_number):
         self.line = line
@@ -46,10 +49,10 @@ class State_Machine:
                         break
 
                 if not self.current_char:
-                    self.alltokens.append((self.line_number,'CMF',block_comment_str))
+                    self.alltokens.append(TokenDefeituoso(self.line_number,'CMF',block_comment_str))
                     raise ComentarioBlocoAberto
             else:
-                self.alltokens.append((self.line_number,'ART','/'))
+                self.alltokens.append(Token(self.line_number,'ART','/'))
 
     def __op_logic_state(self):
         #LOGIC
@@ -57,14 +60,14 @@ class State_Machine:
 
         if self.current_char == '!':
             if next_char == '=':
-                self.alltokens.append((self.line_number,'REL',self.current_char+next_char)) #Operador Relacional
+                self.alltokens.append(Token(self.line_number,'REL',self.current_char+next_char)) #Operador Relacional
                 self.pos+=2
             else:
-                self.alltokens.append((self.line_number, 'LOG', self.current_char)) #Operador Lógico
+                self.alltokens.append(Token(self.line_number, 'LOG', self.current_char)) #Operador Lógico
                 self.pos+=1
 
         elif self.current_char == next_char and self.pos + 1 <  len(self.line): 
-            self.alltokens.append((self.line_number,'LOG', self.current_char + next_char))
+            self.alltokens.append(Token(self.line_number,'LOG', self.current_char + next_char))
             self.pos+=2
 
         else:
@@ -73,10 +76,10 @@ class State_Machine:
             while error and self.pos < len(self.line):
                 #self.pos = self.pos + 1 if self.pos + 1 < len(self.line) else 
                 self.current_char += self.line[self.pos] if self.line[self.pos] not in STOP_ERRORS else ''
-                print(self.current_char)
+                #print(self.current_char)
                 error = True if self.current_char == '' else False
                 self.pos = self.pos +1
-            self.alltokens.append((self.line_number, 'TMF', self.current_char))
+            self.alltokens.append(TokenDefeituoso(self.line_number, 'TMF', self.current_char))
 
     def __op_relational_state(self):
         possible_token = self.current_char #token que iniciou o estado
@@ -84,11 +87,11 @@ class State_Machine:
         self.pos+=1 
         self.current_char = self.line[self.pos] if self.pos < len(self.line) else None
         if self.current_char == '=':
-            self.alltokens.append((self.line_number,'REL',possible_token + self.current_char))
+            self.alltokens.append(Token(self.line_number,'REL',possible_token + self.current_char))
             self.pos+=2
         else:
-            print(self.current_char)
-            self.alltokens.append((self.line_number,'REL',possible_token))
+            #print(self.current_char)
+            self.alltokens.append(Token(self.line_number,'REL',possible_token))
                       
     def __op_aritimetic_state(self):
         possible_token = self.current_char
@@ -103,7 +106,7 @@ class State_Machine:
             #se for operador de decremento
             if self.current_char == '-':
                 possible_token+=self.current_char
-                self.alltokens.append((self.line_number,'ART',possible_token))
+                self.alltokens.append(Token(self.line_number,'ART',possible_token))
                 #proximo lexema
                 self.pos+=1
                 self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
@@ -111,7 +114,7 @@ class State_Machine:
                 # se for um digito então verificamos pelo token anterior se será um número negativo ou operador -
                 if self.last_token == 'IDE' or self.last_token == 'NRO':
                     # se o token anterior for um IDE ou NRO então o - é um operador
-                    self.alltokens.append((self.line_number,'ART',possible_token))
+                    self.alltokens.append(Token(self.line_number,'ART',possible_token))
                     # não atualiza para o proximo char pois já está em digito
                 else:
                     # nos outros casos então temos um número negativo
@@ -120,7 +123,7 @@ class State_Machine:
             # para qualquer ouro caso é o operador -
             else:
                 # insere na lista de tokens sem concatenar novo lexema
-                self.alltokens.append((self.line_number,'ART',possible_token))
+                self.alltokens.append(Token(self.line_number,'ART',possible_token))
         # se não for o - então verifica os outros casos
         else:
             next_char = self.line[self.pos+1] if self.pos+1 < len(self.line) else ''
@@ -133,13 +136,13 @@ class State_Machine:
 
                         possible_token+= self.current_char
                     # insere novo token e atuaLiza proximo lexema
-                    self.alltokens.append((self.line_number,'ART',possible_token))
+                    self.alltokens.append(Token(self.line_number,'ART',possible_token))
 
                     self.pos+=1
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
                 case '*':
                     # insere novo token e atuaLiza proximo lexema
-                    self.alltokens.append((self.line_number,'ART',possible_token))
+                    self.alltokens.append(Token(self.line_number,'ART',possible_token))
 
                     self.pos+=1
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
@@ -165,7 +168,7 @@ class State_Machine:
                 self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
                 cadeia_close = True if self.current_char == '"' else False
                 ascii_invalid = self.current_char not in ASCII and (self.current_char != '"' and self.current_char != '')
-                print((self.current_char, ascii_invalid))
+                #print((self.current_char, ascii_invalid))
                 cadeia= cadeia + self.current_char if self.current_char else cadeia
             else:
                 while self.pos < len(self.line) and not cadeia_close:
@@ -175,11 +178,11 @@ class State_Machine:
                         cadeia_close = True
 
         if cadeia_close and not ascii_invalid:
-            self.alltokens.append((self.line_number,'CAC',cadeia))
+            self.alltokens.append(Token(self.line_number,'CAC',cadeia))
             self.pos+=1
         
         else:
-            self.alltokens.append((self.line_number,'CMF',cadeia))
+            self.alltokens.append(TokenDefeituoso(self.line_number,'CMF',cadeia))
             self.pos+=1
 
     # estado para indentificação de números
@@ -262,10 +265,10 @@ class State_Machine:
 
         # finalizada a leitura do lexema
         if not numero_Mal_formado:
-            self.alltokens.append((self.line_number,'NRO',numero))
+            self.alltokens.append(Token(self.line_number,'NRO',numero))
         else:
-            self.alltokens.append((self.line_number,'NMF',numero))
-        print(self.current_char)
+            self.alltokens.append(TokenDefeituoso(self.line_number,'NMF',numero))
+        #print(self.current_char)
 
     #estado para indentificar identificadores e palavras reservadas
     def __identifier_reserved_word_state(self):
@@ -278,7 +281,7 @@ class State_Machine:
         ascii_invalid = self.current_char not in ASCII or (not self.current_char.isdigit() and not self.current_char.isalpha() )
 
         if ascii_invalid:
-            self.alltokens.append((self.line_number,'TMF',identificador))
+            self.alltokens.append(TokenDefeituoso(self.line_number,'TMF',identificador))
             self.pos+=1 #proximo caractere do identificador
             self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
         else:
@@ -307,13 +310,13 @@ class State_Machine:
             if identificador_MF:
                 # se houve um simbolo invalido no identificador
                 # criar o token do identificador mal formado
-                self.alltokens.append((self.line_number,'IMF',identificador))
+                self.alltokens.append(TokenDefeituoso(self.line_number,'IMF',identificador))
             else:
                 # se é um identificador valido pode ser uma palavra reservada
                 if identificador in RESERVED_WORDS:
-                    self.alltokens.append((self.line_number,'PRE',identificador))
+                    self.alltokens.append(Token(self.line_number,'PRE',identificador))
                 else:
-                    self.alltokens.append((self.line_number,'IDE',identificador))
+                    self.alltokens.append(Token(self.line_number,'IDE',identificador))
 
     def __delimiter_state(self):
         delimitador=''
@@ -325,7 +328,7 @@ class State_Machine:
             self.pos+=1
             self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
 
-            self.alltokens.append((self.line_number,'DEL',delimitador))
+            self.alltokens.append(Token(self.line_number,'DEL',delimitador))
         else:
             print('erro de delimitador ????')
 
@@ -359,9 +362,11 @@ class State_Machine:
                 self.pos = self.pos + 1 
             else:  #Palavra Reservada ou Identificador
                 self.__identifier_reserved_word_state()
-        
+
+
+'''
 #a = '"alalala" "Ç" "ahsjhaiosjoa" <<<<<<<<<<<<<<<<<<< "auhhbdahbdbhia" "2423982u3'
-a= '=-4 = -4'
+a= '=-4 = -4  "ahuaoh'
 b = State_Machine()
 b.new_line(a,0)
 try:
@@ -370,3 +375,5 @@ try:
 except:
     print(b.alltokens)
 print("Ç"not in ASCII)
+
+'''

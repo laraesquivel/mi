@@ -4,19 +4,14 @@ import glob
 class Reader:
     dir = 'files'
     def __init__(self) -> None:
-        self.arquivos = [file for file in glob.glob('analisador_lexico/files' + '/*') if not file.endswith('-saida.txt')]
-        #self.arquivos = glob.glob(Reader.dir + '/*[^-saida].txt')
-#        self.arquivos = glob.glob(Reader.dir + '/*.txt')
-        self.counter = 0
+        self.arquivos = [file for file in glob.glob('files' + '/*') if not file.endswith('-saida.txt')]
+        self.delete_file = [file for file in glob.glob('files' + '/*') if file.endswith('-saida.txt')]
 
-    def list_files(self):
-        print(self.arquivos)
+    def delete(self) -> None:
+        for file in self.delete_file:
+            os.remove(file)
     
-    def read_file(self):
+    def read_file(self):  #Retorna um arquivo lido por linhas
         for ark in self.arquivos:
             with open(ark, 'r', encoding='utf-8') as file:
-                self.counter+=1
-                yield (os.path.splitext(os.path.basename(ark))[0],file.readlines(),self.counter)
-    
-r = Reader()
-r.list_files()
+                yield (os.path.splitext(os.path.basename(ark))[0],file.readlines())

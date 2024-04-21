@@ -4,4 +4,20 @@
 1    LOG    !
 1    LOG    !
 1    LOG    !
-Sucess!
+2    LOG    &&
+2    LOG    &&
+2    LOG    &&
+3    LOG    &&
+3    LOG    &&
+3    LOG    &&
+5    IDE    A
+5    LOG    &&
+5    IDE    A
+6    IDE    A
+6    IDE    A
+7    LOG    !
+4    TMF    &
+4    TMF    &
+6    TMF    &
+7    TMF    &
+7    TMF    |

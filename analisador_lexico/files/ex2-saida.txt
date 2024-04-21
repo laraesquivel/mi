@@ -1,14 +1,12 @@
 1    IDE    shdjkcbskjbckbzlcxnzbnxcojascbjo
 3    REL    =
+3    NRO    -9
 4    REL    =
 4    ART    -
+4    NRO    9
 5    IDE    X
 6    IDE    X
 6    IDE    B
-3    NMF    -9
-
-4    NMF    9
-
 5    TMF    |
 5    IMF    B?
 6    TMF    &

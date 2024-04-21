@@ -216,15 +216,18 @@ class State_Machine:
                     self.pos+=1 
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
 
-                    # faz a verificação imediata do char depois da virgula
-                    if self.current_char in STOP_ERRORS:
+                    # faz a verificação imediata do char depois do ponto
+                    if self.current_char in STOP_ERRORS or self.current_char == ' ' or self.current_char == '\n':
                         numero_Mal_formado = True
                         numero += self.current_char
+                        # se for um espaço depois do ponto então encerra numero
+                        if self.current_char == ' ':
+                            fim_numero= True
                         #proximo caractere do numero
                         self.pos+=1 
                         self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
                 # se for um espaço ou delimitador é o fim do número
-                elif self.current_char == ' ' or self.current_char in STOP_ERRORS:
+                elif self.current_char == ' ' or self.current_char in STOP_ERRORS or self.current_char == '\n':
                     fim_numero= True
                 # se não for um digito
                 elif not self.current_char.isdigit():
@@ -252,7 +255,7 @@ class State_Machine:
                     self.pos+=1 
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
                 # se encontrou o fim do numero 
-                elif self.current_char == ' ' or self.current_char in STOP_ERRORS:
+                elif self.current_char == ' ' or self.current_char in STOP_ERRORS or self.current_char=='\n':
                     fim_numero =True
                 # caso não seja um digito ou fim do numero ex ['-', ' ','\n']
                 elif not self.current_char.isdigit():

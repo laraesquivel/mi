@@ -55,7 +55,7 @@ class Analisador:
                 self.is_open = False
 
             self.writer.write_errors(file_name)
-            self.writer.write_clear()
+            self.writer.write_clear(file_name)
                 
 
 

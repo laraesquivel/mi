@@ -11,7 +11,12 @@ class Writer:
         self.errors_arr = []
 
     
-    def write_clear(self):
+    def write_clear(self,file_name):
+        output_file_path = os.path.join(Writer.dir, f"{file_name}-saida.txt")
+
+        if not self.errors:
+            with open(output_file_path,'a+',encoding='utf-8') as file:
+                file.write('Sucess!')
         self.errors = False
         self.errors_arr.clear()
 

@@ -10,4 +10,4 @@ ASCII = set(chr(i) for i in range(32, 127) if i != 34)
 
 REGEX_BLOCK_COMMENT_PATTERN = r'/\*.*?\*/'
 
-END_COMMENT_BLOCK_PATTER = r'/\*.*?\*/'
+END_COMMENT_BLOCK_PATTER = r'^.*\*/'

@@ -16,8 +16,11 @@
 6    IDE    A
 6    IDE    A
 7    LOG    !
+8    CAC    "msehas@llkk"
 4    TMF    &
 4    TMF    &
 6    TMF    &
 7    TMF    &
 7    TMF    |
+9    CMF    "msehasç
+10    CMF    "trapª

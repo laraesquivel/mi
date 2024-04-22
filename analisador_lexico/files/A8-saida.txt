@@ -73,15 +73,5 @@
 14    NMF    123.-1
 15    NMF    1.2.3
 19    TMF    ç
-23    CMF    "menÇ
-25    CoMF    /* exemplo de teste do lexico bloco
-
-}
-
-/* exa869 mi processadores de
-
-		linguagem de programacao
-
-}*/
-
-ç
+23    CMF    "menÇ"
+30    TMF    ç

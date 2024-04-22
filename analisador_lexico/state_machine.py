@@ -174,9 +174,9 @@ class State_Machine:
                 while self.pos < len(self.line) and not cadeia_close:
                     self.pos +=1
                     self.current_char = self.line[self.pos] if self.pos < len(self.line) else ''
+                    cadeia+= self.current_char
                     if self.current_char == '"':
                         cadeia_close = True
-
         if cadeia_close and not ascii_invalid:
             self.alltokens.append(Token(self.line_number,'CAC',cadeia))
             self.pos+=1
@@ -380,3 +380,10 @@ except:
 print("Ç"not in ASCII)
 
 '''
+
+
+a = '"ahahshansoaÇagsugaus  hiagisigagisga"'
+b= State_Machine()
+b.new_line(a,0)
+b.next_token()
+print(b.alltokens)

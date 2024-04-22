@@ -38,7 +38,7 @@
 
 8    CMF    "mensagem);
 
-9    CMF    "menÇ
+9    CMF    "menÇ"
 12    CoMF    /* exa869 mi processadores de
 
 		linguagem de programacao

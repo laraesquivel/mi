@@ -22,5 +22,5 @@
 6    TMF    &
 7    TMF    &
 7    TMF    |
-9    CMF    "msehasç
-10    CMF    "trapª
+9    CMF    "msehasça"
+10    CMF    "trapªzeio"

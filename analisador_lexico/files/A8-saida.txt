@@ -73,9 +73,5 @@
 14    NMF    123.-1
 15    NMF    1.2.3
 19    TMF    ç
-<<<<<<< HEAD
-23    CMF    "menÇ"
-=======
-23    CMF    "menÇ
->>>>>>> 099d42493955cde87a07d00fbdeb7579b044fbb9
+23    CMF    "menÇagem"
 30    TMF    ç

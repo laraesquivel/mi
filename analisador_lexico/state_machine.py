@@ -381,9 +381,3 @@ print("Ç"not in ASCII)
 
 '''
 
-
-a = '"ahahshansoaÇagsugaus  hiagisigagisga"'
-b= State_Machine()
-b.new_line(a,0)
-b.next_token()
-print(b.alltokens)

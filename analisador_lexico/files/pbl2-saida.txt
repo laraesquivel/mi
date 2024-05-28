@@ -1,0 +1,27 @@
+1    IDE    ALGORITIMO
+1    DEL    {
+2    PRE    constantes
+2    DEL    {
+3    IDE    Real
+3    IDE    A
+3    REL    =
+3    NRO    1.2
+3    DEL    ;
+4    IDE    Inteiro
+4    IDE    B
+4    REL    =
+4    NRO    25
+4    DEL    ;
+5    DEL    }
+7    PRE    funcao
+7    IDE    Inteiro
+7    PRE    principal
+7    DEL    (
+7    DEL    )
+7    DEL    {
+8    PRE    retorno
+8    NRO    0
+8    DEL    ;
+9    DEL    }
+10    DEL    }
+Sucess!

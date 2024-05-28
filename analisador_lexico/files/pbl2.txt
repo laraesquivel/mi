@@ -1,0 +1,10 @@
+ALGORITIMO{
+    constantes{
+        Real A= 1.2;
+        Inteiro B =25;
+    }
+
+    funcao Inteiro principal(){
+        retorno 0;
+    }
+}

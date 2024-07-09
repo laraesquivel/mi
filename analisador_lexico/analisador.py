@@ -15,10 +15,12 @@ class Analisador:
         self.reader.delete()
         self.tokens_sintex = None
         self.all_tokens_file = []
+        self.files_names = []
 
     def analise(self):
         for file_name, file in self.reader.read_file():
-            print(file_name)
+            print(file)
+            self.files_names.append(file_name)
             cmf = ''
             for line_index, line in enumerate(file):
 

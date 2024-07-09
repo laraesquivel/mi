@@ -1,9 +1,9 @@
-from read import Reader
-from writer import Writer
-from interfaces import ComentarioBlocoAberto, Token, TokenDefeituoso
-from state_machine import State_Machine
+from .read import Reader
+from .writer import Writer
+from .interfaces import ComentarioBlocoAberto, Token, TokenDefeituoso
+from .state_machine import State_Machine
 import re
-from config import END_COMMENT_BLOCK_PATTER
+from .config import END_COMMENT_BLOCK_PATTER
 
 class Analisador:
     def __init__(self) -> None:
@@ -12,8 +12,9 @@ class Analisador:
         self.is_open = False
         self.writer = Writer()
         self.error_comf_line = 0
-
         self.reader.delete()
+        self.tokens_sintex = None
+        self.all_tokens_file = []
 
     def analise(self):
         for file_name, file in self.reader.read_file():
@@ -53,9 +54,13 @@ class Analisador:
                 comf = TokenDefeituoso(self.error_comf_line, 'CoMF', cmf)
                 self.writer.errors_arr.append(comf)
                 self.is_open = False
+            
 
+            self.tokens_sintex = self.writer.tokens.copy()
+            self.all_tokens_file.append(self.tokens_sintex)
             self.writer.write_errors(file_name)
             self.writer.write_clear(file_name)
+            
                 
 
 

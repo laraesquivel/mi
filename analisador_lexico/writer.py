@@ -1,6 +1,6 @@
 import glob
 import os
-import interfaces
+from .interfaces import Token
 
 class Writer:
     dir = 'files'
@@ -9,6 +9,8 @@ class Writer:
         self.mode = 'a+'
         self.errors = False
         self.errors_arr = []
+
+        self.tokens = []
 
     
     def write_clear(self,file_name):
@@ -19,6 +21,7 @@ class Writer:
                 file.write('Sucess!')
         self.errors = False
         self.errors_arr.clear()
+        self.tokens.clear()
 
 
         
@@ -27,8 +30,9 @@ class Writer:
 
         with open(output_file_path, 'a+', encoding='utf-8') as file:
             for token in token_arr:
-                if type(token) == interfaces.Token:
+                if type(token) == Token:
                     text_writer = f'{token.line}    {token.code}    {token.token}\n'
+                    self.tokens.append(token)
                     file.write(text_writer)
                 else:
                     self.errors_arr.append(token)
@@ -44,6 +48,7 @@ class Writer:
             for token in self.errors_arr:
                 text_writer = f'{token.line}    {token.code}    {token.token}\n'
                 file.write(text_writer)
+ 
 
 '''
     def write(self, token, kind) -> None:

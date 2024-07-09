@@ -24,8 +24,7 @@ python _init_.py
 '''
 
 
-from analisador import Analisador
+#from analisador import Analisador
 
-a = Analisador()
-
-a.analise()
+#a = Analisador()
+#a.analise()

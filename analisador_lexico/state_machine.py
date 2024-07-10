@@ -1,7 +1,7 @@
-from config import (OP_LOGIC_ONE_CHAR_SET, OP_RELATIONAL_ONE_CHAR_SET, OP_ARITIMETIC_ONE_CHAR_SET,
+from .config import (OP_LOGIC_ONE_CHAR_SET, OP_RELATIONAL_ONE_CHAR_SET, OP_ARITIMETIC_ONE_CHAR_SET,
                     DELIMETER_CHAR_SET, STOP_ERRORS, ASCII,RESERVED_WORDS)
 
-from interfaces import ComentarioBlocoAberto, Token, TokenDefeituoso
+from .interfaces import ComentarioBlocoAberto, Token, TokenDefeituoso
 
 class State_Machine:
     def __init__(self) -> None:
@@ -381,9 +381,3 @@ print("Ç"not in ASCII)
 
 '''
 
-
-a = '"ahahshansoaÇagsugaus  hiagisigagisga"'
-b= State_Machine()
-b.new_line(a,0)
-b.next_token()
-print(b.alltokens)

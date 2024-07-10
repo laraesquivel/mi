@@ -1,6 +1,6 @@
 import glob
 import os
-import interfaces
+from .interfaces import Token
 
 class Writer:
     dir = 'files'
@@ -10,15 +10,18 @@ class Writer:
         self.errors = False
         self.errors_arr = []
 
+        self.tokens = []
+
     
     def write_clear(self,file_name):
         output_file_path = os.path.join(Writer.dir, f"{file_name}-saida.txt")
 
-        if not self.errors:
-            with open(output_file_path,'a+',encoding='utf-8') as file:
-                file.write('Sucess!')
+        #if not self.errors:
+            #with open(output_file_path,'a+',encoding='utf-8') as file:
+                #file.write('Sucess!')
         self.errors = False
         self.errors_arr.clear()
+        self.tokens.clear()
 
 
         
@@ -27,9 +30,10 @@ class Writer:
 
         with open(output_file_path, 'a+', encoding='utf-8') as file:
             for token in token_arr:
-                if type(token) == interfaces.Token:
+                if type(token) == Token:
                     text_writer = f'{token.line}    {token.code}    {token.token}\n'
-                    file.write(text_writer)
+                    self.tokens.append(token)
+                    #file.write(text_writer)
                 else:
                     self.errors_arr.append(token)
                     self.errors = True
@@ -43,7 +47,8 @@ class Writer:
         with open(output_file_path, 'a+', encoding='utf-8') as file:
             for token in self.errors_arr:
                 text_writer = f'{token.line}    {token.code}    {token.token}\n'
-                file.write(text_writer)
+                #file.write(text_writer)
+ 
 
 '''
     def write(self, token, kind) -> None:

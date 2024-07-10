@@ -14,4 +14,5 @@ class Reader:
     def read_file(self):  #Retorna um arquivo lido por linhas
         for ark in self.arquivos:
             with open(ark, 'r', encoding='utf-8') as file:
+                #print(os.path.splitext(os.path.basename(ark))[0])
                 yield (os.path.splitext(os.path.basename(ark))[0],file.readlines())
